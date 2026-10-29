@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Genius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#111827,#312e81,#6d28d9);color:white;display:flex;justify-content:center;align-items:center;padding:20px}
+.game{width:100%;max-width:420px;background:#ffffff14;border:1px solid #ffffff30;border-radius:25px;padding:25px;text-align:center;box-shadow:0 20px 60px #0005}
+h1{font-size:32px;margin:8px 0;color:#fde68a}
+p{line-height:1.8;color:#e5e7eb}
+.number{font-size:65px;margin:15px}
+input{width:100%;padding:15px;font-size:24px;text-align:center;border:2px solid #c4b5fd;border-radius:12px;background:#fff;color:#111827}
+button{border:0;border-radius:12px;padding:13px 18px;font-size:17px;font-weight:bold;cursor:pointer;margin:6px}
+.play{background:#facc15;color:#1f2937;width:100%;margin:12px 0}
+.secondary{background:#ddd6fe;color:#312e81}
+#message{min-height:55px;font-size:18px;font-weight:bold}
+.stats{display:flex;justify-content:space-around;background:#0002;border-radius:12px;padding:12px}
+</style>
+</head>
+<body>
+<div class="game">
+<div class="number">🧠</div>
+<h1>Number Genius</h1>
+<p>عدد مخفی را پیدا کن! عددی بین ۱ تا ۱۰۰ انتخاب کرده‌ام.</p>
+<div class="stats">
+<div>تلاش‌ها<br><strong id="tries">0</strong></div>
+<div>رکورد<br><strong id="best">—</strong></div>
+<div>امتیاز<br><strong id="score">100</strong></div>
+</div>
+<br>
+<input id="guess" type="number" min="1" max="100" placeholder="عدد خود را وارد کن">
+<button class="play" onclick="checkGuess()">بررسی عدد</button>
+<div id="message">آماده‌ای؟ بازی را شروع کن! 🚀</div>
+<button class="secondary" onclick="newGame()">بازی جدید ↻</button>
+</div>
+<script>
+let secret,tries,finished;
+let best=localStorage.getItem('ngbest');
+document.getElementById('best').textContent=best||'—';
+function newGame(){
+ secret=Math.floor(Math.random()*100)+1;
+ tries=0;finished=false;
+ document.getElementById('tries').textContent='0';
+ document.getElementById('score').textContent='100';
+ document.getElementById('guess').value='';
+ document.getElementById('message').textContent='عدد مخفی را حدس بزن! 🎯';
+}
+function checkGuess(){
+ if(finished)return;
+ let input=document.getElementById('guess');
+ let n=Number(input.value);
+ if(!input.value||n<1||n>100||!Number.isInteger(n)){
+  document.getElementById('message').textContent='لطفاً یک عدد صحیح از ۱ تا ۱۰۰ وارد کن.';
+  return;
+ }
+ tries++;
+ document.getElementById('tries').textContent=tries;
+ document.getElementById('score').textContent=Math.max(0,100-(tries-1)*10);
+ let msg=document.getElementById('message');
+ if(n===secret){
+  finished=true;
+  let score=Math.max(10,110-tries*10);
+  document.getElementById('score').textContent=score;
+  msg.textContent='🎉 آفرین! عدد درست '+secret+' بود. امتیاز تو: '+score;
+  if(!best||tries<Number(best)){
+   best=tries;
+   localStorage.setItem('ngbest',best);
+   document.getElementById('best').textContent=best;
+  }
+ }else if(n<secret){
+  msg.textContent='⬆️ عدد مخفی بزرگ‌تر است! دوباره تلاش کن.';
+ }else{
+  msg.textContent='⬇️ عدد مخفی کوچک‌تر است! دوباره تلاش کن.';
+ }
+ input.value='';
+ input.focus();
+}
+document.getElementById('guess').addEventListener('keydown',e=>{
+ if(e.key==='Enter')checkGuess();
+});
+newGame();
+</script>
+</body>
+</html>
